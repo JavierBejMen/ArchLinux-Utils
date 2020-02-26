@@ -22,7 +22,15 @@ specified path, 1 level recursion\n"
 #main functions
 process_dir(){
   if [[ -d $1 ]]; then
-    
+    printf "Updating package stored at ""$1""\n"
+    cd $1
+    remote_url=$(git config --get remote.origin.url)
+    if [ -z "$remote_url" ]; then
+      printf "[Error] can't find remote git url: remote.origin.url\n" >&2
+      exit 1
+    else
+      printf "Pulling from ""$remote_url""\n"
+    fi
   else
     printf "[Error] can't open path: ""$1""\n" >&2
     exit 1
@@ -38,7 +46,7 @@ process_recursive_dir(){
   fi
 }
 
-#Check arguments
+#Check arguments and process
 if [[ $# < 1 ]]; then
   printf "[Error] Wrong number of arguments\nReceived "$#" arguments, expected >=1\n" >&2
   short_help
