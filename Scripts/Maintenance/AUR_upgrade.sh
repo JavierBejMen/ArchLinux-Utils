@@ -29,7 +29,27 @@ process_dir(){
       printf "[Error] can't find remote git url: remote.origin.url\n" >&2
       exit 1
     else
-      printf "Pulling from ""$remote_url""\n"
+      untracked_files=$(git ls-files --other --exclude-standard --directory | egrep -v '/$')
+
+      if [ ! -z "$untracked_files" ]; then
+        printf "Detected untracked files:\n""$TAB""$untracked_files\n"
+        printf "Do you wish to continue? [y/N]\n"
+        continue="N"
+        read continue
+        if [[ ${continue^^} == "N" || -z "$continue" ]]; then
+          printf "Aborted, no changes made\n"
+          exit 0
+        elif [[ ${continue^^} == "Y" ]]; then
+          #statements
+          printf "Pulling from ""$remote_url""\n"
+
+          # TODO - last here
+        else
+          printf "[Error] unknown response: ""$continue""\n" >&2
+          printf "Aborted, no changes made\n"
+          exit 1
+        fi
+      fi
     fi
   else
     printf "[Error] can't open path: ""$1""\n" >&2
